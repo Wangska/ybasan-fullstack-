@@ -18,18 +18,10 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $note_id = (int)$_GET['id'];
 $user_id = $_SESSION['user_id'];
 
-// Database connection
-$servername = "localhost";
-$db_username = "root"; 
-$db_password = ""; 
-$dbname = "noteit_db";
+// Database connection via shared config
+require_once __DIR__ . '/config.php';
 
 try {
-    $conn = new mysqli($servername, $db_username, $db_password, $dbname);
-    
-    if ($conn->connect_error) {
-        throw new Exception("Connection failed: " . $conn->connect_error);
-    }
     
     // Verify the note belongs to the user
     $check_sql = "SELECT id FROM notes WHERE id = ? AND user_id = ?";

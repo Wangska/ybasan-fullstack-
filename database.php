@@ -1,11 +1,17 @@
 <?php
 // database.php - Database connection and functions
 
-// Database configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'noteit_db');
-define('DB_USER', 'root'); // Change to your database username
-define('DB_PASS', ''); // Change to your database password
+// Database configuration from environment (compatible with Coolify)
+$DB_HOST = getenv('DB_HOST') ?: 'localhost';
+$DB_NAME = getenv('DB_DATABASE') ?: 'noteit_db';
+$DB_USER = getenv('DB_USERNAME') ?: 'root';
+$DB_PASS = getenv('DB_PASSWORD') ?: '';
+$DB_PORT = getenv('DB_PORT') ? intval(getenv('DB_PORT')) : 3306;
+$APP_DEBUG = getenv('APP_DEBUG') === 'true' || getenv('APP_DEBUG') === '1';
+
+if ($DB_HOST === 'localhost') {
+    $DB_HOST = '127.0.0.1';
+}
 
 /**
  * Get database connection
@@ -13,15 +19,27 @@ define('DB_PASS', ''); // Change to your database password
  */
 function getConnection() {
     try {
+        $host = getenv('DB_HOST') ?: 'localhost';
+        $dbname = getenv('DB_DATABASE') ?: 'noteit_db';
+        $user = getenv('DB_USERNAME') ?: 'root';
+        $pass = getenv('DB_PASSWORD') ?: '';
+        $port = getenv('DB_PORT') ? intval(getenv('DB_PORT')) : 3306;
+        if ($host === 'localhost') { $host = '127.0.0.1'; }
+
+        $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
         $conn = new PDO(
-            "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
-            DB_USER,
-            DB_PASS,
+            $dsn,
+            $user,
+            $pass,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
         return $conn;
     } catch (PDOException $e) {
-        die("Connection failed: " . $e->getMessage());
+        $debug = getenv('APP_DEBUG') === 'true' || getenv('APP_DEBUG') === '1';
+        if ($debug) {
+            die("Connection failed: " . $e->getMessage());
+        }
+        die("Connection failed: Please check database configuration.");
     }
 }
 
