@@ -1,0 +1,6 @@
+# Force PHP provider and define commands
+[phases.setup]
+aptPkgs = ["php", "php-cli", "php-mysqli"]
+
+[start]
+cmd = "php -S 0.0.0.0:${PORT:-8080} -t ."
